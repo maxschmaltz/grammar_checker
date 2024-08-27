@@ -4,6 +4,8 @@ import json
 from langchain_core.pydantic_v1 import BaseModel
 
 
+# the default JSON format instructions from JSON parsers seem to
+# confuse the LLM, so here's a lightweight variant of it 
 JSON_FORMAT_INSTRUCTIONS = """\
 The output should be a well-formatted JSON instance that strictly conforms to the JSON schema below:
 

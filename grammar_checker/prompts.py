@@ -6,6 +6,10 @@ from grammar_checker.format_instructions import get_json_format_instructions
 
 
 class SentenceAnalysis(BaseModel):
+	# to make sure the pipeline returns a valid JSON, we make this Pydantic model;
+	# there is a slight change in the initial triplet-like output: we added
+	# the reasoning field because LLMs are believed to perform slightly better
+	# when asked to reason the judgement
 	original_sentence: str = Field(..., description="Original sentence")
 	corrected_sentence: str = Field(..., description="Corrected sentence")
 	error_type: str = Field(..., description="The type of the error")
@@ -14,6 +18,7 @@ class SentenceAnalysis(BaseModel):
 analysis_json_parser = JsonOutputParser(pydantic_object=SentenceAnalysis)
 
 
+# 1-shot prompt
 CORRECTION_INSTRUCTIONS = """\
 Check if the original sentence below has grammatical errors and correct the sentence if necessary.\
 Correct only grammatical errors and ignore the others. Describe the error type in few words.\

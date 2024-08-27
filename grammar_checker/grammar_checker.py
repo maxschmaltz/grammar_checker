@@ -23,13 +23,18 @@ class GrammarChecker:
 		if not llm_name:
 			llm_name = "meta/llama3-8b-instruct"
 
+		# NVIDIA-hosted models of choice have pretty much the same interface as ChatOpenAI
 		llm = ChatNVIDIA(
 			model=llm_name,
 			nvidia_api_key=os.getenv("NVIDIA_API_KEY"),
-			temperature=0,
+			temperature=0,	# ensure reproducibility
 			max_tokens=1024
 		)
 
+		# this fixing parser with first try to parse the output with the
+		# underlying parser (JSON parser over `SentenceAnalysis` in our case)
+		# and will retry to fix invalid JSON with an LLM in case the first
+		# parsing(s) fail(s)
 		output_parser = OutputFixingParser.from_llm(
 			llm=llm,
 			parser=analysis_json_parser,
@@ -58,12 +63,15 @@ class GrammarChecker:
 				"exec_error_type": str(type(e))
 			}
 		
-	async def _acheck(self, sents: List[str]) -> Awaitable[List[Dict[str, str]]]:
+	async def acheck(self, sents: List[str]) -> Awaitable[List[Dict[str, str]]]:
+		# in this implementation, the text is processed sentence-wise for a couple of reasons:
+		#	1. convenience of asynchronous processing
+		#	2. if something fails with one sentence, other still get processed
 		tasks = [self._acheck_sentence(sent) for sent in sents]
-		outputs = await asyncio.gather(*tasks)
+		outputs = await asyncio.gather(*tasks)	# async loop
 		return outputs
 
 	def check(self, text: str) -> List[Dict[str, str]]:
 		sents = split_text(text)
-		outputs = asyncio.run(self._acheck(sents))
+		outputs = asyncio.run(self.acheck(sents))
 		return outputs

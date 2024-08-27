@@ -73,7 +73,7 @@ def check():
 
 	text = request.args.get("text")
 
-	if not text.strip():
+	if not text or not text.strip():
 		return {
 			"status": 400,
 			"content": {
@@ -83,6 +83,8 @@ def check():
 		}
 	
 	outputs = checker.check(text)
+	# here, we can postprocess content depending on errors
+	# ...
 	return {
 			"status": 200,
 			"content": outputs,
