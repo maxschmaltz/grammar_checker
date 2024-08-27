@@ -92,4 +92,4 @@ def check():
 		}
 
 
-docs = Swagger(app)
+docs = Swagger(app)	# available under /apidocs
