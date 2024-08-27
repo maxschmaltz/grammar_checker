@@ -17,7 +17,8 @@ analysis_json_parser = JsonOutputParser(pydantic_object=SentenceAnalysis)
 CORRECTION_INSTRUCTIONS = """\
 Check if the original sentence below has grammatical errors and correct the sentence if necessary.\
 Correct only grammatical errors and ignore the others. Describe the error type in few words.\
-If there are multiple errors, list errors in the order of their appearance.
+If there are multiple errors, list errors in the order of their appearance.\
+If the sentence is correct, error type should be "Correct".
 Provide a short one-sentence reasoning of why you think it is a mistake.
 
 {format_instructions}
